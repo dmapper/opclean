@@ -22,6 +22,7 @@ mongo.MongoClient.connect(url, function(err, db){
 
     }, function(){
       db.close();
+      process.exit()
     });
   });
 
