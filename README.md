@@ -1,6 +1,6 @@
 # opclean
 
-Utility for cleaning shrejs oplogs
+Utility for cleaning sharejs oplogs
 
 ## Instalation
 
