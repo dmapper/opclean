@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+
+var cleaner = require('../index');
+var argv = require('yargs')
+    .usage('Usage: $0 -u [url] -d [num] -e [collections list]')
+    .alias('u', 'url')
+    .alias('d', 'days')
+    .alias('e', 'excludes')
+    .describe('u', 'mongodb url')
+    .describe('d', 'amount of days to preserve records')
+    .describe('e', 'collections to exclude')
+    .demand(['u'])
+    .default('d', 7)
+    .default('e', 'auths_ops')
+    .example('$0 -u mongodb://localhost:27017/idg -d 3', 'clean all 3-days old records from all ops-collections (except auths_ops) and except last op')
+    .argv;
+
+var url = argv.u;
+var date = daysAgoFromNow(argv.d);
+
+var exclude = argv.e.split(',');
+
+cleaner(url, date, exclude);
+
+function daysAgoFromNow(days){
+  var date = new Date();
+  date.setDate(date.getDate() - Number(days));
+  return +date;
+}
