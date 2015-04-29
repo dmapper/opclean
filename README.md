@@ -1,6 +1,6 @@
 # opclean
 
-## utility for cleaning shrejs oplogs
+Utility for cleaning shrejs oplogs
 
 ## Instalation
 
