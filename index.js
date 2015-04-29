@@ -1,7 +1,8 @@
 var mongo = require('mongodb');
 var async = require('async');
 
-module.exports = function(url, date, exclude) {
+module.exports = function(url, date, exclude, callback) {
+  var resultes = {};
 
   mongo.MongoClient.connect(url, function (err, db) {
     if (err) throw err;
@@ -16,11 +17,15 @@ module.exports = function(url, date, exclude) {
         }
       });
 
-      console.log('Collections: ', cols.join(', '));
+      if (!callback) console.log('Collections: ', cols.join(', '));
 
       async.eachSeries(cols, cleanCollection.bind(null, db), function () {
         db.close();
-        process.exit()
+        if (callback) {
+          callback(null, resultes);
+        } else {
+          process.exit();
+        }
       });
     });
 
@@ -55,7 +60,8 @@ module.exports = function(url, date, exclude) {
           cb()
         });
       }, function(){
-        console.log(oplogsCollectionName, counter);
+        if (!callback) console.log(oplogsCollectionName, counter);
+        resultes[oplogsCollectionName] = counter;
         done();
       });
 
