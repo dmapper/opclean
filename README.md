@@ -1,6 +1,6 @@
 # opclean
 
-## utility for cleaning shrejs oplogs
+Utility for cleaning sharejs oplogs
 
 ## Instalation
 
@@ -10,7 +10,7 @@ npm install -g opclean
 
 ## Usage
 
-### as a cli tool
+### as a cli-tool
 
 ```bash
 Usage: opclean -u [url] -d [num] -e [collections list]
