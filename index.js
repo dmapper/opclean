@@ -12,7 +12,8 @@ module.exports = function(url, date, exclude, callback) {
       var cols = [];
       collections.forEach(function (col) {
         var name = name = col.collectionName;
-        if (name.indexOf('_ops') !== -1 && exclude.indexOf(name) === -1) {
+        var isOps = name.indexOf('_ops') !== -1 || name.indexOf('ops_') !== -1;
+        if (isOps && exclude.indexOf(name) === -1) {
           cols.push(name);
         }
       });
@@ -32,7 +33,14 @@ module.exports = function(url, date, exclude, callback) {
   });
 
   function cleanCollection(db, oplogsCollectionName, done){
-    var snapshotsCollectionName = oplogsCollectionName.split('_ops')[0];
+    var snapshotsCollectionName;
+
+    if (oplogsCollectionName.indexOf('ops_') !== -1){
+      snapshotsCollectionName = oplogsCollectionName.split('_ops')[0];
+    } else {
+      snapshotsCollectionName = oplogsCollectionName.split('ops_')[1];
+    }
+
 
     if (!snapshotsCollectionName) {
       throw new Error('Cant get collection name from ops-collection: ' + oplogsCollectionName);
@@ -49,10 +57,15 @@ module.exports = function(url, date, exclude, callback) {
 
       async.eachSeries(snapshots, function(snapshot, cb){
         var query = {
-          'name': snapshot._id,
           'v': { $ne: snapshot._v - 1 },
           'm.ts': { $lt: date }
         };
+
+        if (oplogsCollectionName.indexOf('ops_') !== -1){
+          query.name = snapshot._id;
+        } else {
+          query.d = snapshot._id;
+        }
 
         oplogsCollection.remove(query, function(err, res){
 
@@ -67,8 +80,5 @@ module.exports = function(url, date, exclude, callback) {
 
     });
   }
-
-
-
 };
 

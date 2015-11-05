@@ -37,3 +37,7 @@ cleaner('mongodb:/localhost:27017/mydb', 7, ['auths_ops'], function(err, results
 });
 ```
                                   
+## Note
+
+The tool works with two types oplog collections: livedb - collection_ops, and 
+sharedb - ops_collection. 
