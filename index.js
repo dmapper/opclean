@@ -35,7 +35,7 @@ module.exports = function(url, date, exclude, callback) {
   function cleanCollection(db, oplogsCollectionName, done){
     var snapshotsCollectionName;
 
-    if (oplogsCollectionName.indexOf('ops_') !== -1){
+    if (oplogsCollectionName.indexOf('_ops') !== -1){
       snapshotsCollectionName = oplogsCollectionName.split('_ops')[0];
     } else {
       snapshotsCollectionName = oplogsCollectionName.split('ops_')[1];
@@ -61,7 +61,7 @@ module.exports = function(url, date, exclude, callback) {
           'm.ts': { $lt: date }
         };
 
-        if (oplogsCollectionName.indexOf('ops_') !== -1){
+        if (oplogsCollectionName.indexOf('_ops') !== -1){
           query.name = snapshot._id;
         } else {
           query.d = snapshot._id;
