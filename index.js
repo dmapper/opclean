@@ -42,32 +42,44 @@ module.exports = function(url, date, exclude, callback) {
     var snapshotsCollection = db.collection(snapshotsCollectionName);
     var oplogsCollection = db.collection(oplogsCollectionName);
 
-    snapshotsCollection.find().toArray(function (err, snapshots) {
-      if (err) throw err;
+    var skip = 0;
+    var counter = 0;
+    async.forever(function(next) {
+      snapshotsCollection.find().project({
+        _id: 1,
+        _v: 1
+      }).limit(1000).skip(skip * 1000).toArray(function (err, snapshots) {
+        if (err) throw err;
 
-      snapshots = snapshots || [];
-      var counter = 0;
+        snapshots = snapshots || [];
 
-      async.eachSeries(snapshots, function(snapshot, cb){
-        var query = {
-          'v': { $ne: snapshot._v - 1 },
-          'm.ts': { $lt: date }
-        };
+        if (snapshots.length === 0){
+          return next('done');
+        }
 
-        query.d = snapshot._id;
+        async.eachSeries(snapshots, function (snapshot, cb) {
+          var query = {
+            'v': {$ne: snapshot._v - 1},
+            'm.ts': {$lt: date}
+          };
+
+          query.d = snapshot._id;
 
 
-        oplogsCollection.remove(query, function(err, res){
-
-          counter += res.result.n;
-          cb()
+          oplogsCollection.remove(query, function (err, res) {
+            counter += res.result.n;
+            cb()
+          });
+        }, function () {
+          if (!callback) console.log(oplogsCollectionName, counter);
+          skip++;
+          next();
         });
-      }, function(){
-        if (!callback) console.log(oplogsCollectionName, counter);
-        resultes[oplogsCollectionName] = counter;
-        done();
-      });
 
+      });
+    }, function(){
+      resultes[oplogsCollectionName] = counter;
+      done();
     });
   }
 };
