@@ -11,7 +11,7 @@ var argv = require('yargs')
     .describe('e', 'collections to exclude')
     .demand(['u'])
     .default('d', 7)
-    .default('e', 'auths_ops,ops_auths')
+    .default('e', 'o_auths')
     .example('$0 -u mongodb://localhost:27017/idg -d 3', 'clean all 3-days old records from all ops-collections (except auths_ops) and except last op')
     .argv;
 
