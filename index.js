@@ -1,11 +1,15 @@
 var mongo = require('mongodb');
 var async = require('async');
+var {parse} = require('url');
 
 module.exports = function(url, date, exclude, callback) {
   var resultes = {};
+  var parsedUrl = parse(url)
+  var dbName = parsedUrl.pathname.slice(1)
 
-  mongo.MongoClient.connect(url, function (err, db) {
+  mongo.MongoClient.connect(url, function (err, client) {
     if (err) throw err;
+    var db = client.db(dbName);
 
     db.collections(function (err, collections) {
 
@@ -21,7 +25,7 @@ module.exports = function(url, date, exclude, callback) {
       if (!callback) console.log('Collections: ', cols.join(', '));
 
       async.eachSeries(cols, cleanCollection.bind(null, db), function () {
-        db.close();
+        client.close();
         if (callback) {
           callback(null, resultes);
         } else {
